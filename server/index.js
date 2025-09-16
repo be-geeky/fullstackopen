@@ -1,8 +1,9 @@
 const express = require("express");
+const path = require("path");
 const app = express();
 app.use(express.json());
 const cors = require("cors");
-app.use(express.static("dist"));
+
 app.use(cors());
 let notes = [
   {
@@ -71,6 +72,14 @@ const unknownEndpoint = (request, response) => {
 };
 
 app.use(unknownEndpoint);
+
+// Serve React build
+app.use(express.static(path.join(__dirname, "../client/build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/build", "index.html"));
+});
+
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server started on ${PORT}`);
