@@ -1,8 +1,7 @@
 const express = require("express");
-const path = require("path");
 const cors = require("cors");
-const app = express();
 
+const app = express();
 app.use(express.json());
 app.use(cors());
 
@@ -16,31 +15,21 @@ let notes = [
   },
 ];
 
+// generate new id
 const generatedId = () => {
   const MaxId =
     notes.length > 0 ? Math.max(...notes.map((n) => Number(n.id))) : 0;
   return String(MaxId + 1);
 };
 
-// ================= API ROUTES =================
+// Root test
+app.get("/", (req, res) => {
+  res.send("✅ Backend is running!");
+});
+
+// API routes
 app.get("/api/notes", (req, res) => {
   res.json(notes);
-});
-
-app.get("/api/notes/:id", (req, res) => {
-  const id = req.params.id;
-  const note = notes.find((n) => n.id === id);
-  if (note) {
-    res.json(note);
-  } else {
-    res.status(404).json({ error: "note not found" });
-  }
-});
-
-app.delete("/api/notes/:id", (req, res) => {
-  const id = req.params.id;
-  notes = notes.filter((n) => n.id !== id);
-  res.status(204).end();
 });
 
 app.post("/api/notes", (req, res) => {
@@ -57,29 +46,7 @@ app.post("/api/notes", (req, res) => {
   res.json(note);
 });
 
-// Health check endpoint for Render
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
-});
-
-// Unknown API endpoint middleware
-app.use("/api/*", (req, res) => {
-  res.status(404).json({ error: "unknown endpoint" });
-});
-
-// ================= SERVE REACT FRONTEND =================
-// Serve static files from Vite build (dist folder)
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../client/dist")));
-
-  // React Router fallback - catch all handler
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
-  });
-}
-
-// ================= START SERVER =================
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
