@@ -63,11 +63,12 @@ app.use("/api/*", (req, res) => {
 });
 
 // ================= SERVE REACT FRONTEND =================
-app.use(express.static(path.join(__dirname, "../client/build")));
+// ⚠️ Vite outputs to "dist", not "build"
+app.use(express.static(path.join(__dirname, "../client/dist")));
 
-// React Router fallback (works with Express 4 & 5)
+// React Router fallback
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/build", "index.html"));
+  res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
 });
 
 // ================= START SERVER =================
