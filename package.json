@@ -1,0 +1,15 @@
+{
+  "name": "fullstackopen-app",
+  "version": "1.0.0",
+  "description": "Fullstack Open Application",
+  "scripts": {
+    "start": "node server/index.js",
+    "build": "npm run install-deps && npm run build-client",
+    "install-deps": "npm --prefix server install && npm --prefix client install",
+    "build-client": "npm --prefix client run build"
+  },
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
+  }
+}

@@ -1,8 +1,8 @@
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
-
 const app = express();
+
 app.use(express.json());
 app.use(cors());
 
@@ -57,22 +57,29 @@ app.post("/api/notes", (req, res) => {
   res.json(note);
 });
 
+// Health check endpoint for Render
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
+});
+
 // Unknown API endpoint middleware
 app.use("/api/*", (req, res) => {
   res.status(404).json({ error: "unknown endpoint" });
 });
 
 // ================= SERVE REACT FRONTEND =================
-// ⚠️ Vite outputs to "dist", not "build"
-app.use(express.static(path.join(__dirname, "../client/dist")));
+// Serve static files from Vite build (dist folder)
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../client/dist")));
 
-// React Router fallback
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
-});
+  // React Router fallback - catch all handler
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
+  });
+}
 
 // ================= START SERVER =================
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
