@@ -1,6 +1,10 @@
 {
+  "name": "fullstack-app",
   "scripts": {
     "start": "node server/index.js",
-    "heroku-postbuild": "cd client && npm install && npm run build"
+    "build": "cd client && npm install && npm run build"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
   }
 }

@@ -7,16 +7,8 @@ app.use(express.json());
 app.use(cors());
 
 let notes = [
-  {
-    id: "1",
-    content: "HTML is easy",
-    important: true,
-  },
-  {
-    id: "2",
-    content: "Browser can execute only JavaScript",
-    important: false,
-  },
+  { id: "1", content: "HTML is easy", important: true },
+  { id: "2", content: "Browser can execute only JavaScript", important: false },
   {
     id: "3",
     content: "GET and POST are the most important methods of HTTP protocol",
@@ -30,24 +22,18 @@ const generatedId = () => {
   return String(MaxId + 1);
 };
 
-// API routes
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-
+// ================= API ROUTES =================
 app.get("/api/notes", (req, res) => {
   res.json(notes);
 });
 
 app.get("/api/notes/:id", (req, res) => {
-  console.log(req.params.id);
   const id = req.params.id;
   const note = notes.find((n) => n.id === id);
   if (note) {
     res.json(note);
   } else {
-    res.statusMessage = "note not found";
-    res.status(404).end();
+    res.status(404).json({ error: "note not found" });
   }
 });
 
@@ -57,38 +43,35 @@ app.delete("/api/notes/:id", (req, res) => {
   res.status(204).end();
 });
 
-app.post("/api/notes/", (req, res) => {
+app.post("/api/notes", (req, res) => {
   const body = req.body;
   if (!body.content) {
-    return res.status(400).json({
-      error: "content missing",
-    });
+    return res.status(400).json({ error: "content missing" });
   }
   const note = {
     content: body.content,
     important: body.important || false,
     id: generatedId(),
   };
-
-  console.log(note);
+  notes.push(note);
   res.json(note);
 });
 
-// Middleware for unknown API endpoints
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: "unknown endpoint" });
-};
-app.use(unknownEndpoint);
+// Unknown API endpoint middleware
+app.use("/api/*", (req, res) => {
+  res.status(404).json({ error: "unknown endpoint" });
+});
 
-// Serve React build
+// ================= SERVE REACT FRONTEND =================
 app.use(express.static(path.join(__dirname, "../client/build")));
 
-// React fallback (Express 5 regex fix)
-app.get(/.*/, (req, res) => {
+// React Router fallback (works with Express 4 & 5)
+app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/build", "index.html"));
 });
 
+// ================= START SERVER =================
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
