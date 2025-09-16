@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: fullstackopen
-    env: node
-    rootDir: server
-    buildCommand: |
-      npm install
-      cd ../client && npm install && npm run build
-    startCommand: npm start
