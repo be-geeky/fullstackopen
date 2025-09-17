@@ -45,7 +45,25 @@ app.post("/api/notes", (req, res) => {
   notes.push(note);
   res.json(note);
 });
+// ✅ PUT route (update note by id)
+app.put("/api/notes/:id", (req, res) => {
+  const id = req.params.id;
+  const body = req.body;
 
+  const noteIndex = notes.findIndex((n) => n.id === id);
+  if (noteIndex === -1) {
+    return res.status(404).json({ error: "note not found" });
+  }
+
+  const updatedNote = {
+    ...notes[noteIndex],
+    content: body.content ?? notes[noteIndex].content,
+    important: body.important ?? notes[noteIndex].important,
+  };
+
+  notes[noteIndex] = updatedNote;
+  res.json(updatedNote);
+});
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
